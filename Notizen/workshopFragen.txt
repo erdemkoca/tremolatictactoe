@@ -1,0 +1,33 @@
+Fragen Workshop:
+
+Wie werden Chatnachrichten versendet ?? "priv:post" in webAppinterface
+
+
+wo soll am besten logik hin
+
+
+
+
+
+Ablauf von spielzug, überprüfung, versenden, zurückerhalten, anzeigen
+was in backend was frontend
+
+Wie werden die verschiedenen PErsonen/chats im chatmenu angezeigt. Welche variablen verändern sich,
+wenn man in einen chat geht, also wie weiss tremola, an wen welche nachrciht schicken.e
+
+
+Idee: tictactoe button innerhalb vom chatfenster mit person. 
+Falls spiel gestartet, dann öffnet sich innerhalb vom chatfenster ein tictactoe fenster, welches
+nach ende wieder automatisch schliesst.
+
+Idee2: Eigenes Tictactoe Menu (wie chat), dort dann wieder auswahl mit verschiedenen personen, 
+wie im chat fenster und dann tictactoe, obwohl gespielt werden kann, ohne
+dass beide online sein müssen. (wie im chat fenster) 
+
+
+Wir wird ein stand gespeichert, falls die andere person nicht online/wie funktioniert append-only
+nachrichten
+
+
+
+

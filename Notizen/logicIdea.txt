@@ -1,0 +1,7 @@
+Was muss verschickt werden:
+
+Welche Felder sind von wem bespielt. 
+String: feld1:feld2:feld3:feld4:feld5:feld6:feld7:feld8:feld9
+	own:enemy:enemy:empty usw.
+
+
