@@ -301,41 +301,43 @@ function load_chat_item(nm) { // appends a button for conversation with name nm 
 
 
 function load_game_list() {
-
-    document.getElementById("lst:game").innerHTML = '';
-    for (var id in tremola.contacts)
-        if (!tremola.contacts[id].forgotten)
-            load_game_item([id, tremola.contacts[id]]);
-    if (!tremola.settings.hide_forgotten_contacts)
-        for (var id in tremola.contacts) {
-            var c = tremola.contacts[id]
-            if (c.forgotten)
-                load_game_item([id, c]);
+    var meOnly = recps2nm([myId])
+        // console.log('meOnly', meOnly)
+        document.getElementById('lst:game').innerHTML = '';
+        load_game_item(meOnly)
+        var lop = [];
+        for (var p in tremola.chats) {
+            if (p !== meOnly && !tremola.chats[p]['forgotten'])
+                lop.push(p)
         }
+        lop.sort((a, b) => tremola.chats[b]["touched"] - tremola.chats[a]["touched"])
+        lop.forEach((p) =>
+            load_game_item(p)
+        )
+        // forgotten chats: unsorted
+        if (!tremola.settings.hide_forgotten_conv)
+            for (var p in tremola.chats)
+                if (p !== meOnly && tremola.chats[p]['forgotten'])
+                    load_game_item(p)
 }
 
-function load_game_item(c) { // [ id, { "alias": "thealias", "initial": "T", "color": "#123456" } ] }
-    var row, item = document.createElement('div'), bg;
-    item.style = "padding: 0px 5px 10px 5px;";
-    if (!("initial" in c[1])) {
-        c[1]["initial"] = c[1].alias.substring(0, 1).toUpperCase();
-        persist();
-    }
-    if (!("color" in c[1])) {
-        c[1]["color"] = colors[Math.floor(colors.length * Math.random())];
-        persist();
-    }
-    // console.log("load_c_i", JSON.stringify(c[1]))
-    bg = c[1].forgotten ? ' gray' : ' light';
-    row = "<button class=contact_picture style='margin-right: 0.75em; background: " + c[1].color + ";'>" + c[1].initial + "</button>";
-    row += "<button class='chat_item_button" + bg + "' style='overflow: hidden; width: calc(100% - 4em);' onclick='show_contact_details2(\"" + c[0] + "\");'>";
-    row += "<div style='white-space: nowrap;'><div style='text-overflow: ellipsis; overflow: hidden;'>" + escapeHTML(c[1].alias) + "</div>";
-    row += "<div style='text-overflow: clip; overflow: ellipsis;'><font size=-2>" + c[0] + "</font></div></div></button>";
-    // var row  = "<td><button class=contact_picture></button><td style='padding: 5px;'><button class='contact_item_button light w100'>";
-    // row += escapeHTML(c[1].alias) + "<br><font size=-2>" + c[0] + "</font></button>";
-    // console.log(row);
+function load_game_item(nm) { // [ id, { "alias": "thealias", "initial": "T", "color": "#123456" } ] }
+    var cl, mem, item, bg, row, badge, badgeId, cnt;
+    cl = document.getElementById('lst:game');
+    mem = recps2display(tremola.chats[nm].members)
+    item = document.createElement('div');
+    item.style = "padding: 0px 5px 10px 5px; margin: 3px 3px 6px 3px;";
+    if (tremola.chats[nm].forgotten) bg = ' gray'; else bg = ' light';
+    row = "<button class='chat_item_button w100" + bg + "' onclick='load_chat(\"" + nm + "\");' style='overflow: hidden; position: relative;'>";
+    row += "<div style='white-space: nowrap;'><div style='text-overflow: ellipsis; overflow: hidden;'>" + tremola.chats[nm].alias + "</div>";
+    row += "<div style='text-overflow: clip; overflow: ellipsis;'><font size=-2>" + escapeHTML(mem) + "</font></div></div>";
+    badgeId = nm + "-badge"
+    badge = "<div id='" + badgeId + "' style='display: none; position: absolute; right: 0.5em; bottom: 0.9em; text-align: center; border-radius: 1em; height: 2em; width: 2em; background: var(--red); color: white; font-size: small; line-height:2em;'>&gt;9</div>";
+    row += badge + "</button>";
+    row += ""
     item.innerHTML = row;
-    document.getElementById('lst:game').append(item);
+    cl.append(item);
+    set_chats_badge(nm)
 }
 
 
