@@ -72,6 +72,7 @@ function menu_redraw() {
     closeOverlay();
 
     load_chat_list()
+    load_game_list();
 
     document.getElementById("lst:contacts").innerHTML = '';
     load_contact_list();
@@ -156,6 +157,7 @@ function menu_forget_conv() {
     tremola.chats[curr_chat].forgotten = !tremola.chats[curr_chat].forgotten;
     persist();
     load_chat_list() // refresh list of conversations
+    load_game_list()
     closeOverlay();
     if (curr_scenario === 'posts' /* should always be true */ && tremola.chats[curr_chat].forgotten)
         setScenario('chats');
@@ -297,6 +299,47 @@ function load_chat_item(nm) { // appends a button for conversation with name nm 
     set_chats_badge(nm)
 }
 
+
+function load_game_list() {
+
+    document.getElementById("lst:game").innerHTML = '';
+    for (var id in tremola.contacts)
+        if (!tremola.contacts[id].forgotten)
+            load_game_item([id, tremola.contacts[id]]);
+    if (!tremola.settings.hide_forgotten_contacts)
+        for (var id in tremola.contacts) {
+            var c = tremola.contacts[id]
+            if (c.forgotten)
+                load_game_item([id, c]);
+        }
+}
+
+function load_game_item(c) { // [ id, { "alias": "thealias", "initial": "T", "color": "#123456" } ] }
+    var row, item = document.createElement('div'), bg;
+    item.style = "padding: 0px 5px 10px 5px;";
+    if (!("initial" in c[1])) {
+        c[1]["initial"] = c[1].alias.substring(0, 1).toUpperCase();
+        persist();
+    }
+    if (!("color" in c[1])) {
+        c[1]["color"] = colors[Math.floor(colors.length * Math.random())];
+        persist();
+    }
+    // console.log("load_c_i", JSON.stringify(c[1]))
+    bg = c[1].forgotten ? ' gray' : ' light';
+    row = "<button class=contact_picture style='margin-right: 0.75em; background: " + c[1].color + ";'>" + c[1].initial + "</button>";
+    row += "<button class='chat_item_button" + bg + "' style='overflow: hidden; width: calc(100% - 4em);' onclick='show_contact_details2(\"" + c[0] + "\");'>";
+    row += "<div style='white-space: nowrap;'><div style='text-overflow: ellipsis; overflow: hidden;'>" + escapeHTML(c[1].alias) + "</div>";
+    row += "<div style='text-overflow: clip; overflow: ellipsis;'><font size=-2>" + c[0] + "</font></div></div></button>";
+    // var row  = "<td><button class=contact_picture></button><td style='padding: 5px;'><button class='contact_item_button light w100'>";
+    // row += escapeHTML(c[1].alias) + "<br><font size=-2>" + c[0] + "</font></button>";
+    // console.log(row);
+    item.innerHTML = row;
+    document.getElementById('lst:game').append(item);
+}
+
+
+
 function load_contact_list() {
     document.getElementById("lst:contacts").innerHTML = '';
     for (var id in tremola.contacts)
@@ -306,7 +349,11 @@ function load_contact_list() {
         for (var id in tremola.contacts) {
             var c = tremola.contacts[id]
             if (c.forgotten)
-                load_contact_item([id, c]);
+                if (curr_scenario === "contacts") {
+                    load_contact_item([id, c]);
+                } else {
+                    load_contact_item([id, c]);
+                }
         }
 }
 
@@ -334,6 +381,7 @@ function load_contact_item(c) { // [ id, { "alias": "thealias", "initial": "T", 
     document.getElementById('lst:contacts').append(item);
 }
 
+
 function fill_members() {
     var choices = '';
     for (var m in tremola.contacts) {
@@ -355,6 +403,10 @@ function fill_members() {
 function show_contact_details(id) {
     id2b32(id, 'show_contact_details_back')
 }
+
+function show_contact_details2(id) {
+}
+
 
 function show_contact_details_back(shortname, id) {
     var c = tremola.contacts[id];
@@ -421,6 +473,7 @@ function new_conversation() {
         if (tremola.chats[cid].forgotten) {
             tremola.chats[cid].forgotten = false;
             load_chat_list(); // refresh
+            load_game_list()
         } else
             launch_snackbar("Conversation already exists");
         return;
@@ -435,6 +488,7 @@ function new_conversation() {
     } else
         tremola.chats[nm]["touched"] = Date.now()
     load_chat_list();
+    load_game_list()
     setScenario("chats")
     curr_chat = nm
     menu_edit_convname()
@@ -634,6 +688,7 @@ function b2f_new_event(e) { // incoming SSB log event: we get map with three ent
                 "members": e.confid.recps, "touched": Date.now(), "lastRead": 0
             };
             load_chat_list()
+            load_game_list()
         }
         for (i in e.confid.recps) {
             var id, r = e.confid.recps[i];
@@ -657,6 +712,7 @@ function b2f_new_event(e) { // incoming SSB log event: we get map with three ent
         }
         // if (curr_scenario == "chats") // the updated conversation could bubble up
         load_chat_list();
+        load_game_list();
         // console.log(JSON.stringify(tremola))
     }
     persist();
@@ -700,6 +756,7 @@ function b2f_initialize(id) {
     for (nm in tremola.settings)
         setSetting(nm, tremola.settings[nm])
     load_chat_list()
+    load_game_list();
     load_contact_list()
 
     closeOverlay();

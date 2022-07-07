@@ -8,16 +8,16 @@ let display_or_not = [
     'div:qr', 'div:back',
     'core', 'lst:chats', 'lst:posts', 'lst:contacts', 'lst:members', 'the:connex',
     'div:footer', 'div:textarea', 'div:confirm-members', 'plus',
-    'div:settings'
+    'div:settings', 'lst:game'//, 'lst:tictactoe'
 ];
 
 let prev_scenario = 'chats';
 let curr_scenario = 'chats';
 
 // Array of the scenarios that have a button in the footer
-const main_scenarios = ['chats', 'contacts', 'connex'];
+const main_scenarios = ['chats', 'contacts', 'connex', 'game'];
 
-const buttonList = ['btn:chats', 'btn:posts', 'btn:contacts', 'btn:connex'];
+const buttonList = ['btn:chats', 'btn:posts', 'btn:contacts', 'btn:connex', 'btn:game'];
 
 /**
  * The elements contained by each scenario.
@@ -30,13 +30,16 @@ let scenarioDisplay = {
     'posts': ['div:back', 'core', 'lst:posts', 'div:textarea'],
     'connex': ['div:qr', 'core', 'the:connex', 'div:footer', 'plus'],
     'members': ['div:back', 'core', 'lst:members', 'div:confirm-members'],
-    'settings': ['div:back', 'div:settings']
+    'settings': ['div:back', 'div:settings'],
+    'game': [ 'lst:game', 'core', 'div:footer', 'div:back']
+    //'tictactoe': ['div:back', 'core', 'lst:tictactoe', 'div:textarea']>
 }
 
 let scenarioMenu = {
     'chats': [['New conversation', 'menu_new_conversation'],
         ['Settings', 'menu_settings'],
-        ['About', 'menu_about']],
+        ['About', 'menu_about'],
+        ['Launch TicTacToe', 'open_game_menu']],
     'contacts': [['New contact', 'menu_new_contact'],
         ['Settings', 'menu_settings'],
         ['About', 'menu_about']],
@@ -52,6 +55,21 @@ let scenarioMenu = {
         ['About', 'menu_about']],
 
     'settings': []
+
+}
+function open_game_menu() {
+    setScenario('game');
+    //this makes all buttons and menus to disapear
+    closeOverlay();
+    backend('game:ui hello!');
+    launch_snackbar("TicTacToe");
+}
+
+function increment() {
+    var counterVal = document.getElementById('game:counter');
+    var number = counterVal.innerText;
+    number++;
+    counterVal.innerText = number;
 }
 
 function onBackPressed() {
@@ -143,6 +161,7 @@ function btnBridge(element) {
 function menu_settings() {
     closeOverlay();
     setScenario('settings')
+
     /*
     prev_scenario = curr_scenario;
     curr_scenario = 'settings';
