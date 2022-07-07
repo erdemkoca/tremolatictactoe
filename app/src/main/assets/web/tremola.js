@@ -4,6 +4,7 @@
 
 var tremola;
 var curr_chat;
+var curr_game;
 var qr;
 var myId;
 var localPeers = {}; // feedID ~ [isOnline, isConnected] - TF, TT, FT - FF means to remove this entry
@@ -80,7 +81,7 @@ function menu_redraw() {
     if (curr_scenario === "posts")
         load_chat(curr_chat);
     if (curr_scenario === "tictactoe")
-        load_game(curr_chat);
+        load_game(curr_game);
 }
 
 function menu_reset() {
@@ -123,6 +124,10 @@ function edit_confirmed_back(shortname, public_key) {
         "alias": "Chat w/ " + shortname, "posts": {}, "members": recps,
         "touched": Date.now(), "lastRead": 0
     };
+    tremola.games[nm] = {
+            "alias": "Chat w/ " + shortname, "posts": {}, "members": recps,
+            "touched": Date.now(), "lastRead": 0
+        };
     persist();
     backend("add:contact " + new_contact_id + " " + btoa(shortname))
     menu_redraw();
@@ -277,21 +282,24 @@ function load_chat(nm) {
 }
 
 function load_game(nm) {
+
     var ch, pl, e;
-    ch = tremola.chats[nm]
+    ch = tremola.games[nm]
     pl = document.getElementById("lst:tictactoe");
     while (pl.rows.length) {
         pl.deleteRow(0);
     }
-    curr_chat = nm;
+    curr_game = nm;
     var lop = [];
-    for (var p in ch.posts) lop.push(p)
-    lop.sort((a, b) => ch.posts[a].when - ch.posts[b].when)
+    for (var p in ch.tictactoe) lop.push(p)
+    lop.sort((a, b) => ch.tictactoe[a].when - ch.tictactoe[b].when)
     lop.forEach((p) =>
-        load_tictactoe_item(ch.posts[p])
+        load_tictactoe_item(ch.tictactoe[p])
     )
-    load_chat_title(ch);
+
+    //load_chat_title(ch);
     setScenario("tictactoe");
+
     document.getElementById("tremolaTitle").style.display = 'none';
     // scroll to bottom:
     e = document.getElementById('core')
@@ -300,6 +308,7 @@ function load_game(nm) {
     ch["lastRead"] = Date.now();
     persist();
     document.getElementById(nm + '-badge').style.display = 'none' // is this necessary?
+
 }
 
 function load_chat_title(ch) {
@@ -358,18 +367,18 @@ function load_game_list() {
         document.getElementById('lst:game').innerHTML = '';
         load_game_item(meOnly)
         var lop = [];
-        for (var p in tremola.chats) {
-            if (p !== meOnly && !tremola.chats[p]['forgotten'])
+        for (var p in tremola.games) {
+            if (p !== meOnly && !tremola.games[p]['forgotten'])
                 lop.push(p)
         }
-        lop.sort((a, b) => tremola.chats[b]["touched"] - tremola.chats[a]["touched"])
+        lop.sort((a, b) => tremola.games[b]["touched"] - tremola.games[a]["touched"])
         lop.forEach((p) =>
             load_game_item(p)
         )
         // forgotten chats: unsorted
         if (!tremola.settings.hide_forgotten_conv)
-            for (var p in tremola.chats)
-                if (p !== meOnly && tremola.chats[p]['forgotten'])
+            for (var p in tremola.games)
+                if (p !== meOnly && tremola.games[p]['forgotten'])
                     load_game_item(p)
 }
 
@@ -674,10 +683,12 @@ function backend(cmdStr) { // send this to Kotlin (or simulate in case of browse
 function resetTremola() { // wipes browser-side content
     tremola = {
         "chats": {},
+        "games": {},
         "contacts": {},
         "profile": {},
         "id": myId,
         "settings": get_default_settings()
+
     }
     var n = recps2nm([myId])
     tremola.chats[n] = {
@@ -726,6 +737,10 @@ function b2f_new_contact_lookup(target_short_name, new_contact_id) {
         "alias": "Chat w/ " + target_short_name, "posts": {}, "members": recps,
         "touched": Date.now(), "lastRead": 0
     };
+    tremola.games[nm] = {
+            "alias": "Chat w/ " + target_short_name, "posts": {}, "members": recps,
+            "touched": Date.now(), "lastRead": 0
+        };
     persist();
     menu_redraw();
 }
@@ -762,10 +777,6 @@ function b2f_new_event(e) { // incoming SSB log event: we get map with three ent
                 load_chat(conv_name); // reload all messages (not very efficient ...)
                 ch["lastRead"] = Date.now();
             }
-            if (curr_scenario === "tictactoe" && curr_chat === conv_name) {
-                load_game(conv_name); // reload all messages (not very efficient ...)
-                ch["lastRead"] = Date.now();
-            }
 
             set_chats_badge(conv_name)
         }
@@ -774,6 +785,42 @@ function b2f_new_event(e) { // incoming SSB log event: we get map with three ent
         load_game_list();
         // console.log(JSON.stringify(tremola))
     }
+    if (e.confid && e.confid.type === 'tictactoe') {
+            var i, conv_name = recps2nm(e.confid.recps);
+            if (!(conv_name in tremola.games)) { // create new conversation if needed
+                tremola.games[conv_name] = {
+                    "alias": "Unnamed conversation", "tictactoe": {},
+                    "members": e.confid.recps, "touched": Date.now(), "lastRead": 0
+                };
+                //load_chat_list()
+                load_game_list()
+            }
+            for (i in e.confid.recps) {
+                var id, r = e.confid.recps[i];
+                if (!(r in tremola.contacts))
+                    id2b32(r, 'b2f_new_event_back')
+
+            }
+            var ch = tremola.games[conv_name];
+            if (!(e.header.ref in ch.tictactoe)) { // new post
+                // var d = new Date(e.header.tst);
+                // d = d.toDateString() + ' ' + d.toTimeString().substring(0,5);
+                var p = {"key": e.header.ref, "from": e.header.fid, "body": e.confid.text, "when": e.header.tst};
+                ch["tictactoe"][e.header.ref] = p;
+                if (ch["touched"] < e.header.tst)
+                    ch["touched"] = e.header.tst
+                if (curr_scenario === "tictactoe" && curr_game === conv_name) {
+                    load_game(conv_name); // reload all messages (not very efficient ...)
+                    ch["lastRead"] = Date.now();
+                }
+
+                set_chats_badge(conv_name)
+            }
+            // if (curr_scenario == "chats") // the updated conversation could bubble up
+            load_chat_list();
+            load_game_list();
+            // console.log(JSON.stringify(tremola))
+        }
     persist();
     must_redraw = true;
 }
