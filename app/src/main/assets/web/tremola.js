@@ -79,6 +79,8 @@ function menu_redraw() {
 
     if (curr_scenario === "posts")
         load_chat(curr_chat);
+    if (curr_scenario === "tictactoe")
+        load_game(curr_chat);
 }
 
 function menu_reset() {
@@ -224,6 +226,30 @@ function load_post_item(p) { // { 'key', 'from', 'when', 'body', 'to' (if group 
     pl.insertRow(pl.rows.length).innerHTML = row;
 }
 
+function load_tictactoe_item(p) { // { 'key', 'from', 'when', 'body', 'to' (if group or public)>
+    var pl = document.getElementById('lst:tictactoe');
+    var is_other = p["from"] !== myId;
+    var box = "<div class=light style='padding: 3pt; border-radius: 4px; box-shadow: 0 0 5px rgba(0,0,0,0.7);'>"
+    if (is_other)
+        box += "<font size=-1><i>" + fid2display(p["from"]) + "</i></font><br>";
+    var txt = escapeHTML(p["body"]).replace(/\n/g, "<br>\n");
+    var d = new Date(p["when"]);
+    d = d.toDateString() + ' ' + d.toTimeString().substring(0, 5);
+    box += txt + "<div align=right style='font-size: x-small;'><i>";
+    box += d + "</i></div></div>";
+    var row;
+    if (is_other) {
+        var c = tremola.contacts[p.from]
+        row = "<td style='vertical-align: top;'><button class=contact_picture style='margin-right: 0.5em; margin-left: 0.25em; background: " + c.color + "; width: 2em; height: 2em;'>" + c.initial + "</button>"
+        // row  = "<td style='vertical-align: top; color: var(--red); font-weight: 900;'>&gt;"
+        row += "<td colspan=2 style='padding-bottom: 10px;'>" + box + "<td colspan=2>";
+    } else {
+        row = "<td colspan=2><td colspan=2 style='padding-bottom: 10px;'>" + box;
+        row += "<td style='vertical-align: top; color: var(--red); font-weight: 900;'>&lt;"
+    }
+    pl.insertRow(pl.rows.length).innerHTML = row;
+}
+
 function load_chat(nm) {
     var ch, pl, e;
     ch = tremola.chats[nm]
@@ -240,6 +266,32 @@ function load_chat(nm) {
     )
     load_chat_title(ch);
     setScenario("posts");
+    document.getElementById("tremolaTitle").style.display = 'none';
+    // scroll to bottom:
+    e = document.getElementById('core')
+    e.scrollTop = e.scrollHeight;
+    // update unread badge:
+    ch["lastRead"] = Date.now();
+    persist();
+    document.getElementById(nm + '-badge').style.display = 'none' // is this necessary?
+}
+
+function load_game(nm) {
+    var ch, pl, e;
+    ch = tremola.chats[nm]
+    pl = document.getElementById("lst:tictactoe");
+    while (pl.rows.length) {
+        pl.deleteRow(0);
+    }
+    curr_chat = nm;
+    var lop = [];
+    for (var p in ch.posts) lop.push(p)
+    lop.sort((a, b) => ch.posts[a].when - ch.posts[b].when)
+    lop.forEach((p) =>
+        load_tictactoe_item(ch.posts[p])
+    )
+    load_chat_title(ch);
+    setScenario("tictactoe");
     document.getElementById("tremolaTitle").style.display = 'none';
     // scroll to bottom:
     e = document.getElementById('core')
@@ -328,7 +380,7 @@ function load_game_item(nm) { // [ id, { "alias": "thealias", "initial": "T", "c
     item = document.createElement('div');
     item.style = "padding: 0px 5px 10px 5px; margin: 3px 3px 6px 3px;";
     if (tremola.chats[nm].forgotten) bg = ' gray'; else bg = ' light';
-    row = "<button class='chat_item_button w100" + bg + "' onclick='load_chat(\"" + nm + "\");' style='overflow: hidden; position: relative;'>";
+    row = "<button class='chat_item_button w100" + bg + "' onclick='load_game(\"" + nm + "\");' style='overflow: hidden; position: relative;'>";
     row += "<div style='white-space: nowrap;'><div style='text-overflow: ellipsis; overflow: hidden;'>" + tremola.chats[nm].alias + "</div>";
     row += "<div style='text-overflow: clip; overflow: ellipsis;'><font size=-2>" + escapeHTML(mem) + "</font></div></div>";
     badgeId = nm + "-badge"
@@ -710,6 +762,11 @@ function b2f_new_event(e) { // incoming SSB log event: we get map with three ent
                 load_chat(conv_name); // reload all messages (not very efficient ...)
                 ch["lastRead"] = Date.now();
             }
+            if (curr_scenario === "tictactoe" && curr_chat === conv_name) {
+                load_game(conv_name); // reload all messages (not very efficient ...)
+                ch["lastRead"] = Date.now();
+            }
+
             set_chats_badge(conv_name)
         }
         // if (curr_scenario == "chats") // the updated conversation could bubble up

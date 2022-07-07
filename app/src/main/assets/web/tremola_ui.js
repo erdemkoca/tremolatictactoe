@@ -8,7 +8,7 @@ let display_or_not = [
     'div:qr', 'div:back',
     'core', 'lst:chats', 'lst:posts', 'lst:contacts', 'lst:members', 'the:connex',
     'div:footer', 'div:textarea', 'div:confirm-members', 'plus',
-    'div:settings', 'lst:game'//, 'lst:tictactoe'
+    'div:settings', 'lst:game', 'lst:tictactoe'
 ];
 
 let prev_scenario = 'chats';
@@ -17,7 +17,7 @@ let curr_scenario = 'chats';
 // Array of the scenarios that have a button in the footer
 const main_scenarios = ['chats', 'contacts', 'connex', 'game'];
 
-const buttonList = ['btn:chats', 'btn:posts', 'btn:contacts', 'btn:connex', 'btn:game'];
+const buttonList = ['btn:chats', 'btn:posts', 'btn:contacts', 'btn:connex', 'btn:game', 'btn:tictactoe'];
 
 /**
  * The elements contained by each scenario.
@@ -31,8 +31,8 @@ let scenarioDisplay = {
     'connex': ['div:qr', 'core', 'the:connex', 'div:footer', 'plus'],
     'members': ['div:back', 'core', 'lst:members', 'div:confirm-members'],
     'settings': ['div:back', 'div:settings'],
-    'game': [ 'lst:game', 'core', 'div:footer', 'div:back']
-    //'tictactoe': ['div:back', 'core', 'lst:tictactoe', 'div:textarea']>
+    'game': [ 'lst:game', 'core', 'div:footer', 'div:back'],
+    'tictactoe': ['div:back', 'core', 'lst:tictactoe', 'div:textarea']
 }
 
 let scenarioMenu = {
