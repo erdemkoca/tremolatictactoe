@@ -207,6 +207,20 @@ function new_post(s) {
     closeOverlay();
 }
 
+function new_tictactoe(s) {
+    if (s.length === 0) {
+        return;
+    }
+    var gamedraft = unicodeStringToTypedArray(document.getElementById('gamedraft').value); // escapeHTML(
+    var recps = tremola.games[curr_game].members.join(' ')
+    // FIXME Add game functionality / konfiguriere gamedraft nachrcjt.
+    backend("priv:game " + btoa(gamedraft) + " " + recps);
+    var c = document.getElementById('core');
+    c.scrollTop = c.scrollHeight;
+    document.getElementById('gamedraft').value = '';
+    closeOverlay();
+}
+
 function load_post_item(p) { // { 'key', 'from', 'when', 'body', 'to' (if group or public)>
     var pl = document.getElementById('lst:posts');
     var is_other = p["from"] !== myId;
@@ -675,6 +689,20 @@ function backend(cmdStr) { // send this to Kotlin (or simulate in case of browse
         }
         // console.log('e=', JSON.stringify(e))
         b2f_new_event(e)
+    } else if (cmdStr[0] === 'priv:game') {
+        var gamedraft = atob(cmdStr[1])
+        cmdStr.splice(0, 2)
+        var e = {
+            'header': {
+                'tst': Date.now(),
+                'ref': Math.floor(1000000 * Math.random()),
+                'fid': myId
+            },
+            'confid': {'type': 'tictactoe', 'text': gamedraft, 'recps': cmdStr},
+            'public': {}
+        }
+        // console.log('e=', JSON.stringify(e))
+        b2f_new_event(e)
     } else {
         // console.log('backend', JSON.stringify(cmdStr))
     }
@@ -750,6 +778,7 @@ function b2f_new_event(e) { // incoming SSB log event: we get map with three ent
     // console.log('pub', JSON.stringify(e.public))
     // console.log('cfd', JSON.stringify(e.confid))
     if (e.confid && e.confid.type === 'post') {
+        launch_snackbar("if zweig post");
         var i, conv_name = recps2nm(e.confid.recps);
         if (!(conv_name in tremola.chats)) { // create new conversation if needed
             tremola.chats[conv_name] = {
@@ -786,6 +815,7 @@ function b2f_new_event(e) { // incoming SSB log event: we get map with three ent
         // console.log(JSON.stringify(tremola))
     }
     if (e.confid && e.confid.type === 'tictactoe') {
+            //launch_snackbar("if zweig tictactoe");
             var i, conv_name = recps2nm(e.confid.recps);
             if (!(conv_name in tremola.games)) { // create new conversation if needed
                 tremola.games[conv_name] = {
@@ -803,6 +833,7 @@ function b2f_new_event(e) { // incoming SSB log event: we get map with three ent
             }
             var ch = tremola.games[conv_name];
             if (!(e.header.ref in ch.tictactoe)) { // new post
+                launch_snackbar("new tictactoe");
                 // var d = new Date(e.header.tst);
                 // d = d.toDateString() + ' ' + d.toTimeString().substring(0,5);
                 var p = {"key": e.header.ref, "from": e.header.fid, "body": e.confid.text, "when": e.header.tst};
