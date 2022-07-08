@@ -125,7 +125,7 @@ function edit_confirmed_back(shortname, public_key) {
         "touched": Date.now(), "lastRead": 0
     };
     tremola.games[nm] = {
-            "alias": "Chat w/ " + shortname, "tictactoe": {}, "members": recps,
+            "alias": "TicTacToe w/ " + shortname, "tictactoe": {}, "members": recps,
             "touched": Date.now(), "lastRead": 0
         };
     persist();
@@ -405,7 +405,7 @@ function load_game_item(nm) { // [ id, { "alias": "thealias", "initial": "T", "c
     item.style = "padding: 0px 5px 10px 5px; margin: 3px 3px 6px 3px;";
     if (tremola.chats[nm].forgotten) bg = ' gray'; else bg = ' light';
     row = "<button class='chat_item_button w100" + bg + "' onclick='load_game(\"" + nm + "\");' style='overflow: hidden; position: relative;'>";
-    row += "<div style='white-space: nowrap;'><div style='text-overflow: ellipsis; overflow: hidden;'>" + tremola.chats[nm].alias + "</div>";
+    row += "<div style='white-space: nowrap;'><div style='text-overflow: ellipsis; overflow: hidden;'>" + tremola.games[nm].alias + "</div>";
     row += "<div style='text-overflow: clip; overflow: ellipsis;'><font size=-2>" + escapeHTML(mem) + "</font></div></div>";
     badgeId = nm + "-badge"
     badge = "<div id='" + badgeId + "' style='display: none; position: absolute; right: 0.5em; bottom: 0.9em; text-align: center; border-radius: 1em; height: 2em; width: 2em; background: var(--red); color: white; font-size: small; line-height:2em;'>&gt;9</div>";
@@ -771,7 +771,7 @@ function b2f_new_contact_lookup(target_short_name, new_contact_id) {
         "touched": Date.now(), "lastRead": 0
     };
     tremola.games[nm] = {
-            "alias": "Chat w/ " + target_short_name, "tictactoe": {}, "members": recps,
+            "alias": "TicTacToe w/ " + target_short_name, "tictactoe": {}, "members": recps,
             "touched": Date.now(), "lastRead": 0
         };
     persist();
