@@ -208,7 +208,6 @@ function new_post(s) {
 }
 
 function new_tictactoe(s) {
-    backend("DEBUG new_tictactoe()");
     if (s.length === 0) {
         return;
     }
@@ -297,7 +296,6 @@ function load_chat(nm) {
 }
 
 function load_game(nm) {
-    backend('DEBUG load_game()');
     var ch, pl, e;
     ch = tremola.games[nm]
     pl = document.getElementById("lst:tictactoe");
@@ -323,7 +321,6 @@ function load_game(nm) {
     ch["lastRead"] = Date.now();
     persist();
     document.getElementById(nm + '-badge').style.display = 'none' // is this necessary?
-    backend('DEBUG load_game()_END');
 }
 
 function load_chat_title(ch) {
@@ -783,8 +780,6 @@ function b2f_new_event(e) { // incoming SSB log event: we get map with three ent
     // console.log('pub', JSON.stringify(e.public))
     // console.log('cfd', JSON.stringify(e.confid))
     if (e.confid && e.confid.type === 'post') {
-        backend('b2f_new_event_post_case');
-        launch_snackbar("if zweig post");
         var i, conv_name = recps2nm(e.confid.recps);
         if (!(conv_name in tremola.chats)) { // create new conversation if needed
             tremola.chats[conv_name] = {
@@ -821,8 +816,6 @@ function b2f_new_event(e) { // incoming SSB log event: we get map with three ent
         // console.log(JSON.stringify(tremola))
     }
     if (e.confid && e.confid.type === 'tictactoe') {
-            backend('DEBUG b2f_new_event_tictactoe_case');
-            launch_snackbar("if zweig  tictactoe");
             var i, conv_name = recps2nm(e.confid.recps);
             if (!(conv_name in tremola.games)) { // create new conversation if needed
                 tremola.games[conv_name] = {
@@ -839,9 +832,7 @@ function b2f_new_event(e) { // incoming SSB log event: we get map with three ent
 
             }
             var ch = tremola.games[conv_name];
-            backend('DEBUG vor dem tictactoe Header');
             if (!(e.header.ref in ch.tictactoe)) { // new post
-                backend('DEBUG nach dem tictactoe Header');
                 // var d = new Date(e.header.tst);
                 // d = d.toDateString() + ' ' + d.toTimeString().substring(0,5);
                 var p = {"key": e.header.ref, "from": e.header.fid, "body": e.confid.text, "when": e.header.tst};
