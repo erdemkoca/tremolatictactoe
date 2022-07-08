@@ -8,7 +8,7 @@ let display_or_not = [
     'div:qr', 'div:back',
     'core', 'lst:chats', 'lst:posts', 'lst:contacts', 'lst:members', 'the:connex',
     'div:footer', 'div:textarea', 'div:confirm-members', 'plus',
-    'div:settings', 'lst:game', 'lst:tictactoe'
+    'div:settings', 'lst:game', 'lst:tictactoe', 'div:gametextarea'
 ];
 
 let prev_scenario = 'chats';
@@ -32,7 +32,7 @@ let scenarioDisplay = {
     'members': ['div:back', 'core', 'lst:members', 'div:confirm-members'],
     'settings': ['div:back', 'div:settings'],
     'game': [ 'lst:game', 'core', 'div:footer', 'div:back'],
-    'tictactoe': ['div:back', 'core', 'lst:tictactoe', 'div:textarea']
+    'tictactoe': ['div:back', 'core', 'lst:tictactoe', 'div:gametextarea']
 }
 
 let scenarioMenu = {
@@ -206,6 +206,14 @@ function showPreview() {
     s.height = '80%'; // 0.8 * docHeight;
     document.getElementById('overlay-bg').style.display = 'initial';
     overlayIsActive = true;
+}
+
+function sendGame() {
+    var gamedraft = escapeHTML(document.getElementById('gamedraft').value);
+    if (gamedraft.length === 0) return;
+
+    new_tictactoe(gamedraft);
+
 }
 
 function menu_about() {
