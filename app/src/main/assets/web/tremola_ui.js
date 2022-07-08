@@ -38,8 +38,7 @@ let scenarioDisplay = {
 let scenarioMenu = {
     'chats': [['New conversation', 'menu_new_conversation'],
         ['Settings', 'menu_settings'],
-        ['About', 'menu_about'],
-        ['Launch TicTacToe', 'open_game_menu']],
+        ['About', 'menu_about']],
     'contacts': [['New contact', 'menu_new_contact'],
         ['Settings', 'menu_settings'],
         ['About', 'menu_about']],
@@ -53,8 +52,10 @@ let scenarioMenu = {
         ['About', 'menu_about']],
     'members': [['Settings', 'menu_settings'],
         ['About', 'menu_about']],
+    'settings': [],
+    'game': [['Settings', 'menu_settings'],
+    ['About', 'menu_about']]
 
-    'settings': []
 
 }
 function open_game_menu() {
