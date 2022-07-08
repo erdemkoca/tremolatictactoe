@@ -400,7 +400,7 @@ function load_game_list() {
 function load_game_item(nm) { // [ id, { "alias": "thealias", "initial": "T", "color": "#123456" } ] }
     var cl, mem, item, bg, row, badge, badgeId, cnt;
     cl = document.getElementById('lst:game');
-    mem = recps2display(tremola.chats[nm].members)
+    mem = recps2display(tremola.games[nm].members)
     item = document.createElement('div');
     item.style = "padding: 0px 5px 10px 5px; margin: 3px 3px 6px 3px;";
     if (tremola.chats[nm].forgotten) bg = ' gray'; else bg = ' light';
@@ -725,7 +725,7 @@ function resetTremola() { // wipes browser-side content
         "members": [myId], "touched": Date.now(), "lastRead": 0
     };
     tremola.games[n] = {
-            "alias": "local notes (for my eyes only)", "tictactoe": {}, "forgotten": false,
+            "alias": "TicTacToe-SinglePlayer (not available)", "tictactoe": {}, "forgotten": false,
             "members": [myId], "touched": Date.now(), "lastRead": 0
     };
     tremola.contacts[myId] = {"alias": "me", "initial": "M", "color": "#bd7578", "forgotten": false};
