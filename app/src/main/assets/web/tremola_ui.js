@@ -192,6 +192,7 @@ function closeOverlay() {
 }
 
 function showPreview() {
+    backend('showPreviewMethod');
     var draft = escapeHTML(document.getElementById('draft').value);
     if (draft.length === 0) return;
     if (!getSetting("enable_preview")) {
@@ -211,7 +212,7 @@ function showPreview() {
 function sendGame() {
     var gamedraft = escapeHTML(document.getElementById('gamedraft').value);
     if (gamedraft.length === 0) return;
-
+    backend("DEBUG sendgame()");
     new_tictactoe(gamedraft);
 
 }
