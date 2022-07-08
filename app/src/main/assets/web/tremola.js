@@ -125,7 +125,7 @@ function edit_confirmed_back(shortname, public_key) {
         "touched": Date.now(), "lastRead": 0
     };
     tremola.games[nm] = {
-            "alias": "Chat w/ " + shortname, "posts": {}, "members": recps,
+            "alias": "Chat w/ " + shortname, "tictactoe": {}, "members": recps,
             "touched": Date.now(), "lastRead": 0
         };
     persist();
@@ -208,12 +208,13 @@ function new_post(s) {
 }
 
 function new_tictactoe(s) {
+    backend("DEBUG new_tictactoe()");
     if (s.length === 0) {
         return;
     }
     var gamedraft = unicodeStringToTypedArray(document.getElementById('gamedraft').value); // escapeHTML(
     var recps = tremola.games[curr_game].members.join(' ')
-    // FIXME Add game functionality / konfiguriere gamedraft nachrcjt.
+    // FIXME Add game functionality / konfiguriere gamedraft nachricht.
     backend("priv:game " + btoa(gamedraft) + " " + recps);
     var c = document.getElementById('core');
     c.scrollTop = c.scrollHeight;
@@ -296,7 +297,7 @@ function load_chat(nm) {
 }
 
 function load_game(nm) {
-
+    backend('DEBUG load_game()');
     var ch, pl, e;
     ch = tremola.games[nm]
     pl = document.getElementById("lst:tictactoe");
@@ -322,7 +323,7 @@ function load_game(nm) {
     ch["lastRead"] = Date.now();
     persist();
     document.getElementById(nm + '-badge').style.display = 'none' // is this necessary?
-
+    backend('DEBUG load_game()_END');
 }
 
 function load_chat_title(ch) {
@@ -723,6 +724,10 @@ function resetTremola() { // wipes browser-side content
         "alias": "local notes (for my eyes only)", "posts": {}, "forgotten": false,
         "members": [myId], "touched": Date.now(), "lastRead": 0
     };
+    tremola.games[n] = {
+            "alias": "local notes (for my eyes only)", "tictactoe": {}, "forgotten": false,
+            "members": [myId], "touched": Date.now(), "lastRead": 0
+    };
     tremola.contacts[myId] = {"alias": "me", "initial": "M", "color": "#bd7578", "forgotten": false};
     persist();
 }
@@ -766,7 +771,7 @@ function b2f_new_contact_lookup(target_short_name, new_contact_id) {
         "touched": Date.now(), "lastRead": 0
     };
     tremola.games[nm] = {
-            "alias": "Chat w/ " + target_short_name, "posts": {}, "members": recps,
+            "alias": "Chat w/ " + target_short_name, "tictactoe": {}, "members": recps,
             "touched": Date.now(), "lastRead": 0
         };
     persist();
@@ -778,6 +783,7 @@ function b2f_new_event(e) { // incoming SSB log event: we get map with three ent
     // console.log('pub', JSON.stringify(e.public))
     // console.log('cfd', JSON.stringify(e.confid))
     if (e.confid && e.confid.type === 'post') {
+        backend('b2f_new_event_post_case');
         launch_snackbar("if zweig post");
         var i, conv_name = recps2nm(e.confid.recps);
         if (!(conv_name in tremola.chats)) { // create new conversation if needed
@@ -815,7 +821,8 @@ function b2f_new_event(e) { // incoming SSB log event: we get map with three ent
         // console.log(JSON.stringify(tremola))
     }
     if (e.confid && e.confid.type === 'tictactoe') {
-            //launch_snackbar("if zweig tictactoe");
+            backend('DEBUG b2f_new_event_tictactoe_case');
+            launch_snackbar("if zweig  tictactoe");
             var i, conv_name = recps2nm(e.confid.recps);
             if (!(conv_name in tremola.games)) { // create new conversation if needed
                 tremola.games[conv_name] = {
@@ -832,14 +839,16 @@ function b2f_new_event(e) { // incoming SSB log event: we get map with three ent
 
             }
             var ch = tremola.games[conv_name];
+            backend('DEBUG vor dem tictactoe Header');
             if (!(e.header.ref in ch.tictactoe)) { // new post
-                launch_snackbar("new tictactoe");
+                backend('DEBUG nach dem tictactoe Header');
                 // var d = new Date(e.header.tst);
                 // d = d.toDateString() + ' ' + d.toTimeString().substring(0,5);
                 var p = {"key": e.header.ref, "from": e.header.fid, "body": e.confid.text, "when": e.header.tst};
                 ch["tictactoe"][e.header.ref] = p;
                 if (ch["touched"] < e.header.tst)
                     ch["touched"] = e.header.tst
+                    // FIXME Hier kann man neueste Nachricht ausfiltern
                 if (curr_scenario === "tictactoe" && curr_game === conv_name) {
                     load_game(conv_name); // reload all messages (not very efficient ...)
                     ch["lastRead"] = Date.now();
