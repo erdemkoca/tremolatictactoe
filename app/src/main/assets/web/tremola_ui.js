@@ -8,7 +8,7 @@ let display_or_not = [
     'div:qr', 'div:back',
     'core', 'lst:chats', 'lst:posts', 'lst:contacts', 'lst:members', 'the:connex',
     'div:footer', 'div:textarea', 'div:confirm-members', 'plus',
-    'div:settings', 'lst:game', 'lst:tictactoe', 'div:gametextarea'
+    'div:settings', 'lst:game', 'lst:tictactoe', 'div:gametextarea', 'div:invite'
 ];
 
 let prev_scenario = 'chats';
@@ -32,7 +32,7 @@ let scenarioDisplay = {
     'members': ['div:back', 'core', 'lst:members', 'div:confirm-members'],
     'settings': ['div:back', 'div:settings'],
     'game': [ 'lst:game', 'core', 'div:footer', 'div:back'],
-    'tictactoe': ['div:back', 'core', 'lst:tictactoe', 'div:gametextarea']
+    'tictactoe': ['div:back', 'core', 'lst:tictactoe', 'div:invite']
 }
 
 let scenarioMenu = {
@@ -66,11 +66,91 @@ function open_game_menu() {
     launch_snackbar("TicTacToe");
 }
 
+function invite() {
+    var btn = document.getElementById('btn:invite');
+
+    if (accept === 0) {
+        launch_snackbar("invited");
+        tremola.games[curr_game].gameState = "2000000000";
+        disableInviteButton();
+        //disableRestartButton();
+        new_tictactoe(tremola.games[curr_game].gameState);
+    } else {
+        launch_snackbar("accepted, make the first move!");
+        disableInviteButton();
+        enableRestartButton();
+        resetAllFields();
+        //tremola.games[curr_game].gameState = "9000000000"; // accepted, not yet played Nicht nötig, falls kein move, einfach nochmal accepten
+        accept = 0;
+        //start game, all buttons empty, ready to play
+    }
+
+}
+
+function restart() {
+    tremola.games[curr_game].gameState = "1000000000";
+    new_tictactoe(tremola.games[curr_game].gameState);
+    accept = 0;
+}
+
 function increment() {
     var counterVal = document.getElementById('game:counter');
     var number = counterVal.innerText;
     number++;
     counterVal.innerText = number;
+}
+
+function gameMove(pressed) {
+    buttonID = pressed.id;
+    launch_snackbar(pressed);
+    var current_number = tremola.games[curr_game].gameState;
+    //set first field/state to 3
+    current_number = replaceNumber(current_number, "3", 0);
+    var new_number;
+
+    if (buttonID === 'topLeft') {
+        btn = document.getElementById('topLeft');
+        //launch_snackbar("leftGeklickt")
+        new_number = replaceNumber(current_number, "1", 1);
+    } else if (buttonID === 'topMid') {
+        btn = document.getElementById('topMid');
+        new_number = replaceNumber(current_number, "1", 2);
+    } else if (buttonID === 'topRight') {
+        btn = document.getElementById('topRight');
+        new_number = replaceNumber(current_number, "1", 3);
+    } else if (buttonID === 'midLeft') {
+        btn = document.getElementById('midLeft');
+        new_number = replaceNumber(current_number, "1", 4);
+    } else if (buttonID === 'midMid') {
+        btn = document.getElementById('midMid');
+        new_number = replaceNumber(current_number, "1", 5);
+    } else if (buttonID === 'midRight') {
+        btn = document.getElementById('midRight');
+        new_number = replaceNumber(current_number, "1", 6);
+    } else if (buttonID === 'bottomLeft') {
+        btn = document.getElementById('bottomLeft');
+        new_number = replaceNumber(current_number, "1", 7);
+    } else if (buttonID === 'bottomMid') {
+        btn = document.getElementById('bottomMid');
+        new_number = replaceNumber(current_number, "1", 8);
+    } else if (buttonID === 'bottomRight') {
+        btn = document.getElementById('bottomRight');
+        new_number = replaceNumber(current_number, "1", 9);
+    }
+    btn.innerHTML = 'X';
+    disableAllFields();
+    gameNumber = new_number; // weil nächste zeile setFields(); verwendet gameNumber
+    setFields();
+    if (checkIfWin()) {
+        new_number = replaceNumber(new_number, "4", 0);
+    }
+    tremola.games[curr_game].gameState = new_number;
+    new_tictactoe(new_number);
+
+}
+
+function replaceNumber(number, newDigit, index) {
+    return number.substring(0, index) + newDigit + number.substring(index + 1);
 }
 
 function onBackPressed() {

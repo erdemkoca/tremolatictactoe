@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <link rel="stylesheet" type="text/css" href="tremola.css" media="screen"/>
     <script type="text/javascript" charset="UTF-8" src="tremola.js"></script>
+    <script type="text/javascript" charset="UTF-8" src="tictactoe.js"></script>
     <script type="text/javascript" charset="UTF-8" src="tremola_settings.js"></script>
     <script type="text/javascript" charset="UTF-8" src="tremola_ui.js"></script>
     <script type="text/javascript" charset="UTF-8" src="qrcode.min.js"></script>
@@ -68,7 +69,67 @@
 
 
         <table id='lst:tictactoe' style="width: 100%; display: none;">
-            <colgroup>
+            <tr>
+                <td style="vertical-align: middle">
+                    <button id='topLeft' class="flat passive" onclick="gameMove(this);"
+                            style="font-size: medium; height: 100px; width: 100px; margin: 8px; vertical-align: top">
+
+                    </button>
+                </td>
+                <td style="vertical-align: middle">
+                    <button id='topMid' class="flat passive" onclick="gameMove(this);"
+                            style="font-size: medium; height: 100px; width: 100px; margin: 8px; vertical-align: top">
+
+                    </button>
+                </td>
+                <td style="vertical-align: middle">
+                    <button id='topRight' class="flat passive" onclick="gameMove(this);"
+                            style="font-size: medium; height: 100px; width: 100px; margin: 8px; vertical-align: top">
+
+                    </button>
+                </td>
+            </tr>
+            <tr>
+                <td style="vertical-align: middle">
+                    <button id='midLeft' class="flat passive" onclick="gameMove(this);"
+                            style="font-size: medium; height: 100px; width: 100px; margin: 8px; vertical-align: top">
+
+                    </button>
+                </td>
+                <td style="vertical-align: middle">
+                    <button id='midMid' class="flat passive" onclick="gameMove(this);"
+                            style="font-size: medium; height: 100px; width: 100px; margin: 8px; vertical-align: top">
+
+                    </button>
+                </td>
+                <td style="vertical-align: middle">
+                    <button id='midRight' class="flat passive" onclick="gameMove(this);"
+                            style="font-size: medium; height: 100px; width: 100px; margin: 8px; vertical-align: top">
+
+                    </button>
+                </td>
+            </tr>
+            <tr>
+                <td style="vertical-align: middle">
+                    <button id='bottomLeft' class="flat passive" onclick="gameMove(this);"
+                            style="font-size: medium; height: 100px; width: 100px; margin: 8px; vertical-align: top">
+
+                    </button>
+                </td>
+                <td style="vertical-align: middle">
+                    <button id='bottomMid' class="flat passive" onclick="gameMove(this);"
+                            style="font-size: medium; height: 100px; width: 100px; margin: 8px; vertical-align: top">
+
+                    </button>
+                </td>
+                <td style="vertical-align: middle">
+                    <button id='bottomRight' class="flat passive" onclick="gameMove(this);"
+                            style="font-size: medium; height: 100px; width: 100px; margin: 8px; vertical-align: top">
+
+                    </button>
+                </td>
+            </tr>
+            <!--colgroup>
                 <col span="1" style="width: 2%;"/>
                 <col span="1" style="width: 10%;"/>
                 <col span="1" style="width: 76%;"/>
@@ -79,6 +140,8 @@
                 <td align=center colspan=5>-- oldest --
             <tr>
                 <td align=center colspan=5>-- newest --
+            </tr-->
+
         </table>
 
         <div id='lst:contacts' class=w100 style="display: none;margin-top: 6px;"></div>
@@ -345,6 +408,24 @@
                     &nbsp;<!-- font size=+2>&#x1F440;</font><br><font size=small>Preview</font --></button>
     </table>
 
+    <table id="div:invite" class="neutral"
+           style="height: 56px; width: calc(100% - 6pt); display: none; border: 3px inset var(--light); margin: 3pt;"
+           width=100%>
+        <tr>
+            <td width=50% height=100%>
+                <button id='btn:invite' class="flat passive" onclick="invite();"
+                        style="font-size: medium; width: calc(100%); height: 50px; margin-bottom: 4px;">
+                        invite
+                    &nbsp;<!-- font size=+2>&#x1F440;</font><br><font size=small>Preview</font --></button>
+            <td width=50% height=100%>
+                <button id='btn:restart' class="flat passive" onclick="restart();"
+                        style="font-size: medium; width: calc(100%); height: 50px; margin-bottom: 4px;">
+                        restart
+                    &nbsp;<!-- font size=+2>&#x1F440;</font><br><font size=small>Preview</font --></button>
+    </table>
+
+
+
     <div id='div:confirm-members' class=neutral
          style="height: 36px; align-content: center; border: 3px inset var(--light); border-radius: 2pt; margin: 3px; margin-top: 20px; display: none; flex-direction: row; justify-content: center; align-items: center;">
         <!-- button class="flat passive buttontext" style="background-image: url('img/cancel.svg'); width: 50%; height: 50px; margin: 5px;" onclick="onBackPressed();">&nbsp;</--button -->
@@ -462,63 +543,22 @@
             &nbsp;
         </div>
     </div>
-    <!--div id= 'game:ui' style="display: none;overflow:scroll;[...]"></div-->
 
-    <table id='game:ui' style="display: none;height: calc(100% - 60pt); width: calc(100% - 60pt); margin: 30pt;
-    background-image: url('img/tictactoe_background.png');
-    background-repeat:no-repeat;
-    background-position: center;">
-
-        <!--tr>
+    <table id='game:ui' style="display: none;height: calc(100% - 60pt); width: calc(100% - 60pt); margin: 30pt;">
+        <tr>
             <td id="game:counter"
                 style="width: 100%; text-align: center; color: rgba(196,0,0,1); font-size: xxx-large;">
                 1
             </td>
+        </tr>
         <tr>
             <td style="vertical-align: top">
                 <button class="flat passive" onclick="increment();"
-                        style="font-size: medium; height: 50px; width: calc(20% - 16px); margin: 8px; vertical-align: top; horizontal-align: left">
-                    [1,1]
+                        style="font-size: medium; height: 50px; width: calc(100% - 16px); margin: 8px; vertical-align: top">
+                    Add 1
                 </button>
-        <tr>
-            <td style="vertical-align: top">
-                <button class="flat passive" onclick="increment();"
-                        style="font-size: medium; height: 50px; width: calc(20% - 16px); margin: 8px; vertical-align: top; horizontal-align: middle">
-                    [1,2]
-                </button>
-        <tr>
-            <td style="vertical-align: top">
-                <button class="flat passive" onclick="increment();"
-                        style="font-size: medium; height: 50px; width: calc(20% - 16px); margin: 8px; vertical-align: top; horizontal-align: right">
-                    [1,3]
-                </button>
-
-        <tr>
-            <td style="vertical-align: center">
-                <button class="flat passive" onclick="increment();"
-                        style="font-size: medium; height: 50px; width: calc(20% - 16px); margin: 8px; vertical-align: center; horizontal-align: left">
-                    [2,1]
-                </button>
-        <tr>
-            <td style="vertical-align: center">
-                <button class="flat passive" onclick="increment();"
-                        style="font-size: medium; height: 50px; width: calc(20% - 16px); margin: 8px; vertical-align: center; horizontal-align: middle">
-                    [2,2]
-                </button>
-        <tr>
-            <td style="vertical-align: center">
-                <button class="flat passive" onclick="increment();"
-                        style="font-size: medium; height: 50px; width: calc(20% - 16px); margin: 8px; vertical-align: center; horizontal-align: right">
-                    [2,3]
-                </button>
-
-        <tr>
-            <td style="vertical-align: bottom">
-                <button class="flat passive" onclick="decrement();"
-                        style="font-size: medium; height: 50px; width: calc(100% - 16px); margin: 8px; vertical-align: bottom">
-                    Remove 1
-                </button-->
-
+            </td>
+        </tr>
     </table>
 </div>
 </body>

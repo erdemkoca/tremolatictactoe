@@ -126,7 +126,7 @@ function edit_confirmed_back(shortname, public_key) {
     };
     tremola.games[nm] = {
             "alias": "TicTacToe w/ " + shortname, "tictactoe": {}, "members": recps,
-            "touched": Date.now(), "lastRead": 0
+            "touched": Date.now(), "lastRead": 0, "gameState": "1000000000"
         };
     persist();
     backend("add:contact " + new_contact_id + " " + btoa(shortname))
@@ -207,18 +207,16 @@ function new_post(s) {
     closeOverlay();
 }
 
-function new_tictactoe(s) {
-    if (s.length === 0) {
-        return;
-    }
-    var gamedraft = unicodeStringToTypedArray(document.getElementById('gamedraft').value); // escapeHTML(
+function new_tictactoe(state) {
+    //var state = tremola.games[curr_game].gameState;
+    //var gamedraft = unicodeStringToTypedArray(document.getElementById('gamedraft').value); // escapeHTML(
     var recps = tremola.games[curr_game].members.join(' ')
     // FIXME Add game functionality / konfiguriere gamedraft nachricht.
-    backend("priv:game " + btoa(gamedraft) + " " + recps);
-    var c = document.getElementById('core');
+    backend("priv:game " + btoa(state) + " " + recps);
+    /*var c = document.getElementById('core');
     c.scrollTop = c.scrollHeight;
     document.getElementById('gamedraft').value = '';
-    closeOverlay();
+    closeOverlay();*/
 }
 
 function load_post_item(p) { // { 'key', 'from', 'when', 'body', 'to' (if group or public)>
@@ -252,6 +250,7 @@ function load_tictactoe_item(p) { // { 'key', 'from', 'when', 'body', 'to' (if g
     if (is_other)
         box += "<font size=-1><i>" + fid2display(p["from"]) + "</i></font><br>";
     var txt = escapeHTML(p["body"]).replace(/\n/g, "<br>\n");
+    //launch_snackbar(txt);
     var d = new Date(p["when"]);
     d = d.toDateString() + ' ' + d.toTimeString().substring(0, 5);
     box += txt + "<div align=right style='font-size: x-small;'><i>";
@@ -295,7 +294,7 @@ function load_chat(nm) {
     document.getElementById(nm + '-badge').style.display = 'none' // is this necessary?
 }
 
-function load_game(nm) {
+/*function load_game(nm) {
     var ch, pl, e;
     ch = tremola.games[nm]
     pl = document.getElementById("lst:tictactoe");
@@ -314,6 +313,55 @@ function load_game(nm) {
     setScenario("tictactoe");
 
     document.getElementById("tremolaTitle").style.display = 'none';
+    // scroll to bottom:
+    e = document.getElementById('core')
+    e.scrollTop = e.scrollHeight;
+    // update unread badge:
+    ch["lastRead"] = Date.now();
+    persist();
+    document.getElementById(nm + '-badge').style.display = 'none' // is this necessary?
+}*/
+
+function load_game(nm) {
+    var ch, pl, e;
+    ch = tremola.games[nm]
+    pl = document.getElementById("lst:tictactoe");
+    /*while (pl.rows.length) {
+        pl.deleteRow(0);
+    }*/
+    curr_game = nm;
+    var lop = [];
+    for (var p in ch.tictactoe) lop.push(p)
+
+    if (lop.length === 0) {//ganz am anfang der case
+        startConfiguration();
+        setScenario("tictactoe");
+        launch_snackbar("empty");
+        return;
+    }
+
+    var txt;
+    var logEntry;
+    lop.sort((a, b) => ch.tictactoe[a].when - ch.tictactoe[b].when)
+    lop.forEach((p) => logEntry = ch.tictactoe[p])
+    txt = logEntry["body"]; //escapeHTML(p["body"]).replace(/\n/g, "<br>\n"); das nötig??
+    //launch_snackbar(txt);
+    var is_other = logEntry["from"] !== myId;
+    if (!is_other) { //message sent schlussendlich muss !is_other sein!!!, nur für debug auf is_other gesetzt
+        displayOwn();
+        //launch_snackbar("own");
+    } else {
+        launch_snackbar("other");
+        update(txt); //maybe String(txt) ?? falls logEntry kein string ist.
+        //displayOther() nicht mehr nötig, da innerhalb von update display aufgerufen wird
+    }
+
+
+
+    //load_chat_title(ch);
+    setScenario("tictactoe");
+
+    //document.getElementById("tremolaTitle").style.display = 'none';
     // scroll to bottom:
     e = document.getElementById('core')
     e.scrollTop = e.scrollHeight;
@@ -377,7 +425,7 @@ function load_game_list() {
     var meOnly = recps2nm([myId])
         // console.log('meOnly', meOnly)
         document.getElementById('lst:game').innerHTML = '';
-        load_game_item(meOnly)
+        //load_game_item(meOnly)
         var lop = [];
         for (var p in tremola.games) {
             if (p !== meOnly && !tremola.games[p]['forgotten'])
@@ -723,7 +771,7 @@ function resetTremola() { // wipes browser-side content
     };
     tremola.games[n] = {
             "alias": "TicTacToe-SinglePlayer (not available)", "tictactoe": {}, "forgotten": false,
-            "members": [myId], "touched": Date.now(), "lastRead": 0
+            "members": [myId], "touched": Date.now(), "lastRead": 0, "gameState": "1000000000"
     };
     tremola.contacts[myId] = {"alias": "me", "initial": "M", "color": "#bd7578", "forgotten": false};
     persist();
@@ -769,7 +817,7 @@ function b2f_new_contact_lookup(target_short_name, new_contact_id) {
     };
     tremola.games[nm] = {
             "alias": "TicTacToe w/ " + target_short_name, "tictactoe": {}, "members": recps,
-            "touched": Date.now(), "lastRead": 0
+            "touched": Date.now(), "lastRead": 0, "gameState": "1000000000"
         };
     persist();
     menu_redraw();
@@ -816,11 +864,12 @@ function b2f_new_event(e) { // incoming SSB log event: we get map with three ent
         // console.log(JSON.stringify(tremola))
     }
     if (e.confid && e.confid.type === 'tictactoe') {
+        //launch_snackbar("enteredtictactoe");
             var i, conv_name = recps2nm(e.confid.recps);
             if (!(conv_name in tremola.games)) { // create new conversation if needed
                 tremola.games[conv_name] = {
                     "alias": "Unnamed conversation", "tictactoe": {},
-                    "members": e.confid.recps, "touched": Date.now(), "lastRead": 0
+                    "members": e.confid.recps, "touched": Date.now(), "lastRead": 0, "gameState": "1000000000"
                 };
                 //load_chat_list()
                 load_game_list()
@@ -839,8 +888,8 @@ function b2f_new_event(e) { // incoming SSB log event: we get map with three ent
                 ch["tictactoe"][e.header.ref] = p;
                 if (ch["touched"] < e.header.tst)
                     ch["touched"] = e.header.tst
-                    // FIXME Hier kann man neueste Nachricht ausfiltern
                 if (curr_scenario === "tictactoe" && curr_game === conv_name) {
+                    //launch_snackbar("loadGameinb2f");
                     load_game(conv_name); // reload all messages (not very efficient ...)
                     ch["lastRead"] = Date.now();
                 }
