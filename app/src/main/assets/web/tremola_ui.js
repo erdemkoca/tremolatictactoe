@@ -141,9 +141,13 @@ function gameMove(pressed) {
     disableAllFields();
     gameNumber = new_number; // weil nächste zeile setFields(); verwendet gameNumber
     setFields();
+    if (!new_number.includes("0")) {
+        new_number = replaceNumber(new_number, "5", 0);
+    }
     if (checkIfWin()) {
         new_number = replaceNumber(new_number, "4", 0);
     }
+
     tremola.games[curr_game].gameState = new_number;
     new_tictactoe(new_number);
 

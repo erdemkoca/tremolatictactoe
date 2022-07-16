@@ -74,6 +74,10 @@ function update(newMessage) { //ACHTUNG: startet bei 1 nicht bei 0
         display();
         return;
     }
+    if (newState === "5") {
+        tremola.games[curr_game].gameState = flipNumbers(String(newNumber));
+        display();
+    }
 }
 
 function flipNumbers(number) {
@@ -126,11 +130,13 @@ function displayOwn() {
         disableInviteButton();
         enableRestartButton();
         launch_snackbar("YOU WON!!!!");
-    }/* else if (state === "9") { //accepted not yet played
-        resetAllFields();
+    } else if (state === "5") { //no winner
+        displayFields();
+        disableAllFieldsWithoutReset();
         disableInviteButton();
-        enableRestartButton();    nicht nötig dieser else if zweig
-    }*/
+        enableRestartButton();
+        launch_snackbar("GAME ENDED, NO WINNER");
+    }
 }
 
 function display() {
@@ -149,6 +155,12 @@ function display() {
         disableInviteButton();
         enableRestartButton();
         launch_snackbar("YOU LOST!!!");
+    } else if (state === "4") {
+        displayFields();
+        disableAllFieldsWithoutReset();
+        disableInviteButton();
+        enableRestartButton();
+        launch_snackbar("GAME ENDED, NO WINNER");
     }
 }
 
