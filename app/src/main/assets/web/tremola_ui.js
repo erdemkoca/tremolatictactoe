@@ -60,9 +60,7 @@ let scenarioMenu = {
 }
 function open_game_menu() {
     setScenario('game');
-    //this makes all buttons and menus to disapear
     closeOverlay();
-    backend('game:ui hello!');
     launch_snackbar("TicTacToe");
 }
 
@@ -80,7 +78,6 @@ function invite() {
         disableInviteButton();
         enableRestartButton();
         resetAllFields();
-        //tremola.games[curr_game].gameState = "9000000000"; // accepted, not yet played Nicht nötig, falls kein move, einfach nochmal accepten
         accept = 0;
         //start game, all buttons empty, ready to play
     }
@@ -101,10 +98,8 @@ function increment() {
 }
 
 function gameMove(pressed) {
-    launch_snackbar("gamemove");
     var buttonID = pressed.id;
     var btn;
-    launch_snackbar(pressed);
     var current_number = tremola.games[curr_game].gameState;
     //set first field/state to 3
     current_number = replaceNumber(current_number, "3", 0);
@@ -112,7 +107,6 @@ function gameMove(pressed) {
 
     if (buttonID === 'topLeft') {
         btn = document.getElementById('topLeft');
-        //launch_snackbar("leftGeklickt")
         new_number = replaceNumber(current_number, "1", 1);
     } else if (buttonID === 'topMid') {
         btn = document.getElementById('topMid');

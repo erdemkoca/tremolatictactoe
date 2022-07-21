@@ -294,33 +294,6 @@ function load_chat(nm) {
     document.getElementById(nm + '-badge').style.display = 'none' // is this necessary?
 }
 
-/*function load_game(nm) {
-    var ch, pl, e;
-    ch = tremola.games[nm]
-    pl = document.getElementById("lst:tictactoe");
-    while (pl.rows.length) {
-        pl.deleteRow(0);
-    }
-    curr_game = nm;
-    var lop = [];
-    for (var p in ch.tictactoe) lop.push(p)
-    lop.sort((a, b) => ch.tictactoe[a].when - ch.tictactoe[b].when)
-    lop.forEach((p) =>
-        load_tictactoe_item(ch.tictactoe[p])
-    )
-
-    //load_chat_title(ch);
-    setScenario("tictactoe");
-
-    document.getElementById("tremolaTitle").style.display = 'none';
-    // scroll to bottom:
-    e = document.getElementById('core')
-    e.scrollTop = e.scrollHeight;
-    // update unread badge:
-    ch["lastRead"] = Date.now();
-    persist();
-    document.getElementById(nm + '-badge').style.display = 'none' // is this necessary?
-}*/
 
 function load_game(nm) {
     var ch, pl, e;
@@ -452,13 +425,13 @@ function load_game_item(nm) { // [ id, { "alias": "thealias", "initial": "T", "c
     row = "<button class='chat_item_button w100" + bg + "' onclick='load_game(\"" + nm + "\");' style='overflow: hidden; position: relative;'>";
     row += "<div style='white-space: nowrap;'><div style='text-overflow: ellipsis; overflow: hidden;'>" + tremola.games[nm].alias + "</div>";
     row += "<div style='text-overflow: clip; overflow: ellipsis;'><font size=-2>" + escapeHTML(mem) + "</font></div></div>";
-    badgeId = nm + "-badge"
+    badgeId = nm + "-noti"
     badge = "<div id='" + badgeId + "' style='display: none; position: absolute; right: 0.5em; bottom: 0.9em; text-align: center; border-radius: 1em; height: 2em; width: 2em; background: var(--red); color: white; font-size: small; line-height:2em;'>&gt;9</div>";
     row += badge + "</button>";
     row += ""
     item.innerHTML = row;
     cl.append(item);
-    set_chats_badge(nm)
+    set_games_badge(nm)
 }
 
 
@@ -654,6 +627,15 @@ function getUnreadCnt(nm) {
     return cnt;
 }
 
+function getUnreadCntNoti(nm) {
+    var c = tremola.chats[nm], cnt = 0;
+    for (var p in c.posts) {
+        if (c.posts[p].when > c.lastRead)
+            return 1;
+    }
+    return cnt;
+}
+
 function set_chats_badge(nm) {
     var e = document.getElementById(nm + '-badge'), cnt;
     cnt = getUnreadCnt(nm)
@@ -663,6 +645,17 @@ function set_chats_badge(nm) {
     }
     e.style.display = null;
     if (cnt > 9) cnt = ">9"; else cnt = "" + cnt;
+    e.innerHTML = cnt
+}
+
+function set_games_badge(nm) {
+    var e = document.getElementById(nm + '-noti'), cnt;
+    cnt = getUnreadCntNoti(nm)
+    if (cnt === 0) {
+        e.style.display = 'none';
+        return
+    }
+    e.style.display = null;
     e.innerHTML = cnt
 }
 
@@ -864,7 +857,6 @@ function b2f_new_event(e) { // incoming SSB log event: we get map with three ent
         // console.log(JSON.stringify(tremola))
     }
     if (e.confid && e.confid.type === 'tictactoe') {
-        //launch_snackbar("enteredtictactoe");
             var i, conv_name = recps2nm(e.confid.recps);
             if (!(conv_name in tremola.games)) { // create new conversation if needed
                 tremola.games[conv_name] = {
@@ -889,12 +881,11 @@ function b2f_new_event(e) { // incoming SSB log event: we get map with three ent
                 if (ch["touched"] < e.header.tst)
                     ch["touched"] = e.header.tst
                 if (curr_scenario === "tictactoe" && curr_game === conv_name) {
-                    //launch_snackbar("loadGameinb2f");
                     load_game(conv_name); // reload all messages (not very efficient ...)
                     ch["lastRead"] = Date.now();
                 }
 
-                set_chats_badge(conv_name)
+                set_games_badge(conv_name)
             }
             // if (curr_scenario == "chats") // the updated conversation could bubble up
             load_chat_list();
