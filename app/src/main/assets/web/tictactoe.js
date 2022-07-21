@@ -125,6 +125,7 @@ function displayOwn() {
         displayFields();
         disableInviteButton();
         enableRestartButton();
+        disableAllFieldsWithoutReset();
     } else if (state === "4") {
         displayFields();
         disableInviteButton();
