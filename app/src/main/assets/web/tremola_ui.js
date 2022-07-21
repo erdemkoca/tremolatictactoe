@@ -101,7 +101,9 @@ function increment() {
 }
 
 function gameMove(pressed) {
-    buttonID = pressed.id;
+    launch_snackbar("gamemove");
+    var buttonID = pressed.id;
+    var btn;
     launch_snackbar(pressed);
     var current_number = tremola.games[curr_game].gameState;
     //set first field/state to 3

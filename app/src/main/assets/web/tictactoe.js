@@ -343,6 +343,7 @@ function resetAllFields() {
     btn = document.getElementById('bottomRight');
     btn.innerHTML = '';
     btn.disabled = false;
+    launch_snackbar("all buttons reset");
 }
 
 function disableAllFieldsWithoutReset() {
