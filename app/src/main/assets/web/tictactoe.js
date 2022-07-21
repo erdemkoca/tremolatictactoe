@@ -60,16 +60,16 @@ function update(newMessage) { //ACHTUNG: startet bei 1 nicht bei 0
         display();
         return;
     }
-    if (oldState === "1" && newState === "2") { //Gegner hat invited -> accept decline
+    if (/*oldState === "1" && */newState === "2") { //Gegner hat invited -> accept decline
         displayAcceptDecline();
         return;
     }
-    if (oldState === "2" && newState === "3" || oldState === "3" && newState === "3") { //ich invited, gegner accepted und erster spielzug, oder normaler spielverlauf
+    if (/*oldState === "2" && */newState === "3" || oldState === "3" && newState === "3") { //ich invited, gegner accepted und erster spielzug, oder normaler spielverlauf
         tremola.games[curr_game].gameState = flipNumbers(String(newNumber));
         display();
         return;
     }
-    if (oldState === "3" && newState === "4") { //Gegner gewonnen -> you lost
+    if (/*oldState === "3" && */newState === "4") { //Gegner gewonnen -> you lost
         tremola.games[curr_game].gameState = flipNumbers(String(newNumber));
         display();
         return;
