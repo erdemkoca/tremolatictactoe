@@ -628,10 +628,10 @@ function getUnreadCnt(nm) {
 }
 
 function getUnreadCntNoti(nm) {
-    var c = tremola.chats[nm], cnt = 0;
-    for (var p in c.posts) {
-        if (c.posts[p].when > c.lastRead)
-            return 1;
+    var c = tremola.games[nm], cnt = 0;
+    for (var p in c.tictactoe) {
+        if (c.tictactoe[p].when > c.lastRead)
+            cnt = 1;
     }
     return cnt;
 }
@@ -653,6 +653,7 @@ function set_games_badge(nm) {
     cnt = getUnreadCntNoti(nm)
     if (cnt === 0) {
         e.style.display = 'none';
+        launch_snackbar("none badge");
         return
     }
     e.style.display = null;
@@ -853,7 +854,7 @@ function b2f_new_event(e) { // incoming SSB log event: we get map with three ent
         }
         // if (curr_scenario == "chats") // the updated conversation could bubble up
         load_chat_list();
-        load_game_list();
+        //load_game_list();
         // console.log(JSON.stringify(tremola))
     }
     if (e.confid && e.confid.type === 'tictactoe') {
@@ -888,7 +889,7 @@ function b2f_new_event(e) { // incoming SSB log event: we get map with three ent
                 set_games_badge(conv_name)
             }
             // if (curr_scenario == "chats") // the updated conversation could bubble up
-            load_chat_list();
+            //load_chat_list();
             load_game_list();
             // console.log(JSON.stringify(tremola))
         }
