@@ -250,7 +250,6 @@ function load_tictactoe_item(p) { // { 'key', 'from', 'when', 'body', 'to' (if g
     if (is_other)
         box += "<font size=-1><i>" + fid2display(p["from"]) + "</i></font><br>";
     var txt = escapeHTML(p["body"]).replace(/\n/g, "<br>\n");
-    //launch_snackbar(txt);
     var d = new Date(p["when"]);
     d = d.toDateString() + ' ' + d.toTimeString().substring(0, 5);
     box += txt + "<div align=right style='font-size: x-small;'><i>";
@@ -309,7 +308,6 @@ function load_game(nm) {
     if (lop.length === 0) {//ganz am anfang der case
         startConfiguration();
         setScenario("tictactoe");
-        launch_snackbar("empty");
         return;
     }
 
@@ -317,16 +315,12 @@ function load_game(nm) {
     var logEntry;
     lop.sort((a, b) => ch.tictactoe[a].when - ch.tictactoe[b].when)
     lop.forEach((p) => logEntry = ch.tictactoe[p])
-    txt = logEntry["body"]; //escapeHTML(p["body"]).replace(/\n/g, "<br>\n"); das nötig??
-    //launch_snackbar(txt);
+    txt = logEntry["body"];
     var is_other = logEntry["from"] !== myId;
-    if (!is_other) { //message sent schlussendlich muss !is_other sein!!!, nur für debug auf is_other gesetzt
+    if (!is_other) {
         displayOwn();
-        //launch_snackbar("own");
     } else {
-        launch_snackbar("other");
-        update(txt); //maybe String(txt) ?? falls logEntry kein string ist.
-        //displayOther() nicht mehr nötig, da innerhalb von update display aufgerufen wird
+        update(txt);
     }
 
 
@@ -653,7 +647,6 @@ function set_games_badge(nm) {
     cnt = getUnreadCntNoti(nm)
     if (cnt === 0) {
         e.style.display = 'none';
-        launch_snackbar("none badge");
         return
     }
     e.style.display = null;

@@ -17,17 +17,6 @@ var newNumber;
 var accept = 0;
 
 function setFields() {
-
-    /*topLeft = Math.floor(gameNumber % 1000000000 / 100000000);
-    topMid = Math.floor(gameNumber % 100000000 / 10000000);
-    topRight = Math.floor(gameNumber % 10000000 / 1000000);
-    midLeft = Math.floor(gameNumber % 1000000 / 100000);
-    midMid = Math.floor(gameNumber % 100000 / 10000);
-    midRight = Math.floor(gameNumber % 10000 / 1000);
-    bottomLeft = Math.floor(gameNumber % 1000 / 100);
-    bottomMid = Math.floor(gameNumber % 100 / 10);
-    bottomRight = Math.floor(gameNumber % 10 / 1);*/
-
     topLeft = gameNumber.charAt(1);
     topMid = gameNumber.charAt(2);
     topRight = gameNumber.charAt(3);
@@ -42,8 +31,6 @@ function setFields() {
 function setStates(newMessage) {
     oldNumber = tremola.games[curr_game].gameState;
     newNumber = String(newMessage);
-    //oldState = Math.floor(tremola.games[curr_game].gameState / 1000000000);
-    //newState = Math.floor(newMessage / 1000000000);
     oldState = tremola.games[curr_game].gameState.charAt(0);
     newState = String(newMessage).charAt(0);
 }
@@ -52,24 +39,23 @@ function update(newMessage) { //ACHTUNG: startet bei 1 nicht bei 0
     setStates(newMessage);
     if (oldNumber === flipNumbers(newNumber)) {//wiederholtes  öffnen des Spiels. Nichts muss geupdatet werden.
         display();
-        //launch_snackbar(newState);
-        return; //Vielleicht muss newState noch geflipt werden!
+        return;
     }
     if (newState === "1") { //restart
         tremola.games[curr_game].gameState = "1000000000";
         display();
         return;
     }
-    if (/*oldState === "1" && */newState === "2") { //Gegner hat invited -> accept decline
+    if (newState === "2") { //Gegner hat invited -> accept decline
         displayAcceptDecline();
         return;
     }
-    if (/*oldState === "2" && */newState === "3" || oldState === "3" && newState === "3") { //ich invited, gegner accepted und erster spielzug, oder normaler spielverlauf
+    if (newState === "3") { //ich invited, gegner accepted und erster spielzug, oder normaler spielverlauf
         tremola.games[curr_game].gameState = flipNumbers(String(newNumber));
         display();
         return;
     }
-    if (/*oldState === "3" && */newState === "4") { //Gegner gewonnen -> you lost
+    if (newState === "4") { //Gegner gewonnen -> you lost
         tremola.games[curr_game].gameState = flipNumbers(String(newNumber));
         display();
         return;
@@ -96,7 +82,6 @@ function flipNumbers(number) {
 function displayAcceptDecline() {
     disableAllFields();
     accept = 1;
-    //launch_snackbar("displayAcceptdevlne");
     var btn = document.getElementById('btn:invite');
     btn.innerHTML = 'accept';
     btn.disabled = false;
@@ -343,7 +328,6 @@ function resetAllFields() {
     btn = document.getElementById('bottomRight');
     btn.innerHTML = '';
     btn.disabled = false;
-    launch_snackbar("all buttons reset");
 }
 
 function disableAllFieldsWithoutReset() {
