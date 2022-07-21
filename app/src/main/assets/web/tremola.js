@@ -341,7 +341,7 @@ function load_game(nm) {
     // update unread badge:
     ch["lastRead"] = Date.now();
     persist();
-    document.getElementById(nm + '-badge').style.display = 'none' // is this necessary?
+    document.getElementById(nm + '-noti').style.display = 'none' // is this necessary?
 }
 
 function load_chat_title(ch) {

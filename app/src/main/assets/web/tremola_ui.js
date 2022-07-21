@@ -54,6 +54,8 @@ let scenarioMenu = {
         ['About', 'menu_about']],
     'settings': [],
     'game': [['Settings', 'menu_settings'],
+    ['About', 'menu_about']],
+    'tictactoe': [['Settings', 'menu_settings'],
     ['About', 'menu_about']]
 
 
