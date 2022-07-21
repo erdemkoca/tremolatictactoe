@@ -99,7 +99,7 @@ function displayOwn() {
         startConfiguration();
     } else if (state === "2") {
         launch_snackbar("waiting for enemy to accept");
-        disableRestartButton();
+        enableRestartButton();
         disableInviteButton();
         disableAllFields();
 
