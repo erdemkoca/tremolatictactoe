@@ -156,19 +156,13 @@ function display() {
         disableInviteButton();
         enableRestartButton();
         launch_snackbar("YOU LOST!!!");
-    } else if (state === "4") {
-        displayFields();
-        disableAllFieldsWithoutReset();
-        disableInviteButton();
-        enableRestartButton();
-        launch_snackbar("GAME ENDED, NO WINNER");
     } else if (state === "5") { //no winner
          displayFields();
          disableAllFieldsWithoutReset();
          disableInviteButton();
          enableRestartButton();
          launch_snackbar("GAME ENDED, NO WINNER");
-     }
+    }
 }
 
 function displayFields() {
