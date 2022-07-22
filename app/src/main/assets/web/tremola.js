@@ -207,16 +207,12 @@ function new_post(s) {
     closeOverlay();
 }
 
+/**
+ * Diese Methode setzt priv:game als Prefix für die Nachricht und sendet diese zum Backend.
+ */
 function new_tictactoe(state) {
-    //var state = tremola.games[curr_game].gameState;
-    //var gamedraft = unicodeStringToTypedArray(document.getElementById('gamedraft').value); // escapeHTML(
     var recps = tremola.games[curr_game].members.join(' ')
-    // FIXME Add game functionality / konfiguriere gamedraft nachricht.
     backend("priv:game " + btoa(state) + " " + recps);
-    /*var c = document.getElementById('core');
-    c.scrollTop = c.scrollHeight;
-    document.getElementById('gamedraft').value = '';
-    closeOverlay();*/
 }
 
 function load_post_item(p) { // { 'key', 'from', 'when', 'body', 'to' (if group or public)>
@@ -243,6 +239,11 @@ function load_post_item(p) { // { 'key', 'from', 'when', 'body', 'to' (if group 
     pl.insertRow(pl.rows.length).innerHTML = row;
 }
 
+/**
+ * Diese Methode war nur nötig, um den zweiten separaten Chat zu erstellen. Sie ist eine Kopie von
+ * load_post_item(), wobei sie ein neues HTML-Element "lst:tictactoe" verwendet. Für das Spiel ist
+ * diese Methode jedoch nicht nötig.
+ */
 function load_tictactoe_item(p) { // { 'key', 'from', 'when', 'body', 'to' (if group or public)>
     var pl = document.getElementById('lst:tictactoe');
     var is_other = p["from"] !== myId;
@@ -293,14 +294,19 @@ function load_chat(nm) {
     document.getElementById(nm + '-badge').style.display = 'none' // is this necessary?
 }
 
-
+/**
+ * Diese Methode ladet das Spiel, sobald man auf ein TicTacToe Spiel eines Kontaktes klickt, oder
+ * das Spiel schon geöffnet hat und eine neue Nachricht dem Log appended wurde,
+ * um das Feld zu aktualisieren.
+ * Die Methode fügt alle Nachrichten im Log in den Stack " lop", sortiert diese und speichert die neuste
+ * Nachricht in der Variable logEntry. Falls diese Nachricht eine eigene Nachricht ist, wird displayOwn()
+ * aufgerufen, sonst update().
+ */
 function load_game(nm) {
     var ch, pl, e;
     ch = tremola.games[nm]
     pl = document.getElementById("lst:tictactoe");
-    /*while (pl.rows.length) {
-        pl.deleteRow(0);
-    }*/
+
     curr_game = nm;
     var lop = [];
     for (var p in ch.tictactoe) lop.push(p)
@@ -315,20 +321,21 @@ function load_game(nm) {
     var logEntry;
     lop.sort((a, b) => ch.tictactoe[a].when - ch.tictactoe[b].when)
     lop.forEach((p) => logEntry = ch.tictactoe[p])
+
+    //gameState
     txt = logEntry["body"];
+
     var is_other = logEntry["from"] !== myId;
-    if (!is_other) {
+
+    if (!is_other) {//eigene Nachricht
         displayOwn();
-    } else {
+
+    } else { //Nachricht vom Gegner
         update(txt);
     }
 
-
-
-    //load_chat_title(ch);
     setScenario("tictactoe");
 
-    //document.getElementById("tremolaTitle").style.display = 'none';
     // scroll to bottom:
     e = document.getElementById('core')
     e.scrollTop = e.scrollHeight;
@@ -387,7 +394,10 @@ function load_chat_item(nm) { // appends a button for conversation with name nm 
     set_chats_badge(nm)
 }
 
-
+/**
+ * Diese Methode ladet für jeden Kontakt einen Button um auf das Spiel mit dieser Person zu öffnen.
+ * Diese Methode ist kopiert von load_chat_list().
+ */
 function load_game_list() {
     var meOnly = recps2nm([myId])
         // console.log('meOnly', meOnly)
@@ -409,6 +419,10 @@ function load_game_list() {
                     load_game_item(p)
 }
 
+/**
+ * Diese Methode wird in der Methode load_game_list() für jeden Kontakt aufgerufen um den Button zu laden.
+ * Dies ist eine Kopie von load_chat_item().
+ */
 function load_game_item(nm) { // [ id, { "alias": "thealias", "initial": "T", "color": "#123456" } ] }
     var cl, mem, item, bg, row, badge, badgeId, cnt;
     cl = document.getElementById('lst:game');
@@ -850,6 +864,7 @@ function b2f_new_event(e) { // incoming SSB log event: we get map with three ent
         //load_game_list();
         // console.log(JSON.stringify(tremola))
     }
+    // Der case wenn eine Spielstand Nachricht empfangen wird.
     if (e.confid && e.confid.type === 'tictactoe') {
             var i, conv_name = recps2nm(e.confid.recps);
             if (!(conv_name in tremola.games)) { // create new conversation if needed
@@ -874,6 +889,7 @@ function b2f_new_event(e) { // incoming SSB log event: we get map with three ent
                 ch["tictactoe"][e.header.ref] = p;
                 if (ch["touched"] < e.header.tst)
                     ch["touched"] = e.header.tst
+                //falls man das Spiel mit diesem Kontakt schon geöffnet hat
                 if (curr_scenario === "tictactoe" && curr_game === conv_name) {
                     load_game(conv_name); // reload all messages (not very efficient ...)
                     ch["lastRead"] = Date.now();

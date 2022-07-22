@@ -42,7 +42,9 @@ class SSBmsgTypes(val tremolaState: TremolaState) {
         Log.d("PRIV_POST", ctxt)
         return mkWire(ctxt)
     }
-
+    /**
+     * Diese Methode wird verwendet um einer Message den type "tictactoe" zu setzen.
+     */
     fun mkGame(text: String, toWhom: List<String>): String {
         val recps = JSONArray()
         val keys: MutableList<ByteArray> = mutableListOf<ByteArray>()

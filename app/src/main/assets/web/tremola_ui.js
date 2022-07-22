@@ -60,12 +60,22 @@ let scenarioMenu = {
 
 
 }
+/**
+ * Diese Methode ist die onClick Methode des TicTacToe-Buttons in der unteren Leiste von Tremola.
+ * Hier wird das Scenario "game" gesetzt.
+ */
 function open_game_menu() {
     setScenario('game');
     closeOverlay();
     launch_snackbar("TicTacToe");
 }
 
+/**
+ * Diese Methode ist die onClick Methode des invite-Buttons. Es wird mit der accept Variable unterschieden
+ * ob der Button im invite-Modus ist oder im accept-Modus.
+ * Im invite-Modus wird der dazugehörige Spielstand versendet.
+ * Im accept-Modus wird die Einladung akzeptiert und der erste Spielzug ist möglich
+ */
 function invite() {
     var btn = document.getElementById('btn:invite');
 
@@ -73,7 +83,6 @@ function invite() {
         launch_snackbar("invited");
         tremola.games[curr_game].gameState = "2000000000";
         disableInviteButton();
-        //disableRestartButton();
         new_tictactoe(tremola.games[curr_game].gameState);
     } else {
         launch_snackbar("accepted, make the first move!");
@@ -86,24 +95,28 @@ function invite() {
 
 }
 
+/**
+* Dies ist die onClick Methode für den Restart-Button.
+* Hier muss nicht unterschieden werden, ob sich der
+* Button im restart- oder decline-Modus befindet,
+* da beide den gleichen Effekt haben. Der Start-Spielstand wird hier versendet.
+*/
 function restart() {
     tremola.games[curr_game].gameState = "1000000000";
     new_tictactoe(tremola.games[curr_game].gameState);
     accept = 0;
 }
 
-function increment() {
-    var counterVal = document.getElementById('game:counter');
-    var number = counterVal.innerText;
-    number++;
-    counterVal.innerText = number;
-}
-
+/** Dies ist die onClick Methode aller Spielfeldbuttons. Je nachdem, welcher button geklickt wurde,
+ * wird der Spielstand geupdatet, indem die Ziffer am richtigen Index mit einer 1 ersetzt wird.
+ * Am Ende wird überprüft, ob der Spieler das Spiel gewonnen hat oder ob das Spielfeld voll ist. Dieser
+ * Spielstand wird dann versendet.
+ */
 function gameMove(pressed) {
     var buttonID = pressed.id;
     var btn;
     var current_number = tremola.games[curr_game].gameState;
-    //set first field/state to 3
+    //Spielstand 3
     current_number = replaceNumber(current_number, "3", 0);
     var new_number;
 
@@ -139,18 +152,26 @@ function gameMove(pressed) {
     disableAllFields();
     gameNumber = new_number; // weil nächste zeile setFields(); verwendet gameNumber
     setFields();
+    //checkt ob noch ein Feld frei ist (eine 0 vorhanden ist)
     if (!new_number.includes("0")) {
-        new_number = replaceNumber(new_number, "5", 0);
+        new_number = replaceNumber(new_number, "5", 0); //Spielstand 5
     }
+    //überprüft ob man einen Gewinner-Spielzug gemacht hat
     if (checkIfWin()) {
-        new_number = replaceNumber(new_number, "4", 0);
+        new_number = replaceNumber(new_number, "4", 0); //Spielstand 4
     }
 
+    //Aktualisieren des Spielstandes
     tremola.games[curr_game].gameState = new_number;
+    //Versenden des Spielstandes
     new_tictactoe(new_number);
 
 }
 
+/**
+ * Diese Methode ersetzt in einem String "number" die Ziffer am Index "index" mit der neuen Ziffer
+ * "newDigit".
+ */
 function replaceNumber(number, newDigit, index) {
     return number.substring(0, index) + newDigit + number.substring(index + 1);
 }
@@ -173,6 +194,13 @@ function onBackPressed() {
         }
         setScenario(prev_scenario);
     }
+}
+
+function increment() {
+    var counterVal = document.getElementById('game:counter');
+    var number = counterVal.innerText;
+    number++;
+    counterVal.innerText = number;
 }
 
 function setScenario(new_scenario) {
@@ -292,10 +320,13 @@ function showPreview() {
     overlayIsActive = true;
 }
 
+/**
+ * Diese Methode wurde verwendet um eine Nachricht vom textFeld zu versenden im seperaten zweiten Chat.
+ * Diese Methode ist für das Spiel jedoch nicht mehr relevant.
+ */
 function sendGame() {
     var gamedraft = escapeHTML(document.getElementById('gamedraft').value);
     if (gamedraft.length === 0) return;
-    backend("DEBUG sendgame()");
     new_tictactoe(gamedraft);
 
 }

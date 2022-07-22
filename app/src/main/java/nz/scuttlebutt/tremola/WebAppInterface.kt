@@ -130,6 +130,7 @@ class WebAppInterface(private val act: Activity, val tremolaState: TremolaState,
                 evnt?.let { rx_event(it) } // persist it, propagate horizontally and also up
                 return
             }
+            // Dies ist der case, wenn eine Spielzug Nachricht vom Frontend erhalten wird.
             "priv:game" -> { // Post a private game move
                 // atob(text) recipient1 recipient2 ...
                 val rawStr = tremolaState.msgTypes.mkGame(
